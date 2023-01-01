@@ -83,42 +83,23 @@ int main(int argc, char **argv) {
   Node tmp(64042);
   Node tmp2(63786);
 
-  struct sockaddr_in aa = tmp.getNodeAddress();
-
-  cout << "HREE" <<aa.sin_port<< endl;
-
-  int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd < 0) {
-      // Error creating socket
-      return 1;
-  }
-
-  // Set up the destination address and port number
-  struct sockaddr_in dest_addr;
-  dest_addr.sin_family = AF_INET;
-  dest_addr.sin_port = htons(64042);  // Port number in network byte order
-  dest_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // Destination IP address
-
   // Set up the data to be sent
   std::string data = "Hello, world!";
-  size_t data_size = data.size();
+  unsigned int data_size = static_cast<unsigned int>(data.size());
 
-  // Send the data
-  ssize_t sent_bytes = sendto(sockfd, data.c_str(), data_size, 0, \
-  reinterpret_cast<sockaddr*>(&dest_addr), sizeof(dest_addr)); \
-  // Use ssize_t because error returns negative value. data.c_str() is of type const void*,
-  // i.e. a pointer to any type. Last parameter is of type socklen_t, i.e. size of a socket
-  // address structure
-  if (sent_bytes < 0) {
-      // Error sending data
-      cout << "Allah est grand"<<endl;
-      return 1;
+  int i = 1;
+  int* p = &i;
+  void* p1 = static_cast<void*>(p);
+  tmp.setData({p1});
+  ssize_t x = tmp.SendToNode(tmp2,p1,data_size);
+
+  for (void* p : tmp.getData()) {
+    cout<<"tmp "<<p<<endl;
   }
-
-  // Close the socket
-  close(sockfd);
-  //
-
+  for (void* p : tmp2.getData()) {
+    cout<<" tmp 2 "<<p<<endl;
+  }
+  cout<<" x "<<x<<endl;
   std::cout << "Broadcasting and delivering messages...\n\n";
 
   // After a process finishes broadcasting,
